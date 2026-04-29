@@ -1,0 +1,21 @@
+import { ConfigService } from '@nestjs/config';
+import { RoleName } from '@prisma/client';
+import { Strategy } from 'passport-jwt';
+export type JwtUser = {
+    userId: number;
+    email: string;
+    role: RoleName;
+};
+type JwtPayload = {
+    sub: number;
+    email: string;
+    role: RoleName;
+};
+declare const JwtStrategy_base: new (...args: [opt: import("passport-jwt").StrategyOptionsWithRequest] | [opt: import("passport-jwt").StrategyOptionsWithoutRequest]) => Strategy & {
+    validate(...args: any[]): unknown;
+};
+export declare class JwtStrategy extends JwtStrategy_base {
+    constructor(config: ConfigService);
+    validate(payload: JwtPayload): JwtUser;
+}
+export {};

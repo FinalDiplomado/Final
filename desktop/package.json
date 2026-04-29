@@ -1,0 +1,14 @@
+{
+  "name": "desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "dev": "wait-on --timeout 120000 http://localhost:5173 http://localhost:3000/api/health && electron .",
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^37.10.3",
+    "wait-on": "^9.0.5"
+  }
+}

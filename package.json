@@ -1,0 +1,31 @@
+{
+  "name": "proyectofinal",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "desktop"
+  ],
+  "scripts": {
+    "dev:backend": "npm run start:dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "dev:desktop": "npm run dev -w desktop",
+    "dev": "concurrently -k -n backend,frontend,desktop -c blue,green,magenta \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:desktop\"",
+    "prod:desktop": "npm run build -w frontend && npm run start -w desktop",
+    "db:setup": "npm run prisma:push -w backend && npm run db:seed",
+    "db:migrate": "npm run prisma:migrate -w backend",
+    "db:seed": "npm run prisma:seed -w backend",
+    "lint": "npm run lint -w backend && npm run lint -w frontend",
+    "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "wait-on": "^9.0.5"
+  }
+}

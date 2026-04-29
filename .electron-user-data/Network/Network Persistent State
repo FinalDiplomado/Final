@@ -1,0 +1,1 @@
+{"net":{"http_server_properties":{"servers":[{"anonymization":[],"server":"https://img.freepik.com","supports_spdy":true}],"supports_quic":{"address":"192.168.1.12","used_quic":true},"version":5},"network_qualities":{"CAISABiAgICA+P////8B":"3G","CAYSABiAgICA+P////8B":"Offline"}}}

@@ -1,0 +1,323 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  ADMIN
+  EVALUATOR
+}
+
+enum UserType {
+  NOVICE
+  EXPERT
+}
+
+enum EvaluationStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum UsabilityDimension {
+  EFFECTIVENESS
+  EFFICIENCY
+  SATISFACTION
+}
+
+enum StoryStatus {
+  DRAFT
+  APPROVED
+  DONE
+}
+
+enum MoSCoWPriority {
+  MUST
+  SHOULD
+  COULD
+  WONT
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum QuestionType {
+  NUMBER
+  LIKERT_1_5
+  TEXT
+  BOOLEAN
+}
+
+model Role {
+  id    Int      @id @default(autoincrement())
+  name  RoleName @unique
+  users User[]
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  fullName     String
+  roleId       Int
+  role         Role      @relation(fields: [roleId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  evaluations  Evaluation[] @relation("CreatedEvaluations")
+  answers      Answer[]
+  taskAttempts TaskAttempt[]
+  manualUserStories ManualUserStory[]
+  evaluatorAssignments EvaluationEvaluator[] @relation("EvaluatorAssignments")
+  assignedEvaluations EvaluationEvaluator[] @relation("AssignedBy")
+  sessions EvaluationSession[]
+  auditLogs AuditLog[]
+  interfaceSelections InterfaceSelection[]
+}
+
+model Evaluation {
+  id           Int              @id @default(autoincrement())
+  title        String
+  systemName   String
+  userType     UserType
+  usageContext String
+  scoringWeightEffectiveness Float @default(1)
+  scoringWeightEfficiency    Float @default(1)
+  scoringWeightSatisfaction  Float @default(1)
+  status       EvaluationStatus @default(DRAFT)
+  createdById  Int
+  createdBy    User             @relation("CreatedEvaluations", fields: [createdById], references: [id])
+  interfaces   Interface[]
+  answers      Answer[]
+  taskAttempts TaskAttempt[]
+  manualUserStories ManualUserStory[]
+  evaluators EvaluationEvaluator[]
+  selections InterfaceSelection[]
+  sessions EvaluationSession[]
+  auditLogs AuditLog[]
+  result       Result?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model Interface {
+  id           Int       @id @default(autoincrement())
+  evaluationId Int
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  name         String
+  imageUrl     String?
+  prototypeUrl String?
+  order        Int       @default(0)
+  questions    Question[]
+  answers      Answer[]
+  tasks        Task[]
+  manualUserStories ManualUserStory[]
+  selections   InterfaceSelection[]
+  recommendedByResults Result[] @relation("RecommendedInterface")
+  recommendedByUserStories UserStory[] @relation("RecommendedInterfaceForUserStory")
+  recommendedByManualUserStories ManualUserStory[] @relation("RecommendedInterfaceForManualUserStory")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([evaluationId, order])
+}
+
+model Task {
+  id           Int       @id @default(autoincrement())
+  interfaceId  Int
+  interface    Interface @relation(fields: [interfaceId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  targetTimeSec Int?
+  targetSteps  Int?
+  order        Int       @default(0)
+  attempts     TaskAttempt[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([interfaceId, order])
+}
+
+model TaskAttempt {
+  id           Int       @id @default(autoincrement())
+  evaluationId Int
+  taskId       Int
+  evaluatorId  Int
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  task         Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  evaluator    User       @relation(fields: [evaluatorId], references: [id], onDelete: Restrict)
+  completed    Boolean
+  errorsCount  Int       @default(0)
+  timeSec      Int?
+  stepsCount   Int?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([evaluationId, taskId, evaluatorId])
+}
+
+model Question {
+  id         Int               @id @default(autoincrement())
+  interfaceId Int
+  interface  Interface         @relation(fields: [interfaceId], references: [id], onDelete: Cascade)
+  dimension  UsabilityDimension
+  type       QuestionType
+  prompt     String
+  helpText   String?
+  isRequired Boolean           @default(true)
+  weight     Float             @default(1)
+  order      Int               @default(0)
+  answers    Answer[]
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@unique([interfaceId, order])
+}
+
+model Answer {
+  id          Int       @id @default(autoincrement())
+  evaluationId Int
+  interfaceId Int
+  questionId  Int
+  evaluatorId Int
+  evaluation  Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  interface   Interface  @relation(fields: [interfaceId], references: [id], onDelete: Cascade)
+  question    Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  evaluator   User       @relation(fields: [evaluatorId], references: [id], onDelete: Restrict)
+  valueNumber Float?
+  valueText   String?
+  valueBoolean Boolean?
+  valueLikert Int?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([evaluationId, questionId, evaluatorId])
+}
+
+model Result {
+  id                Int      @id @default(autoincrement())
+  evaluationId      Int      @unique
+  evaluation        Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  recommendedInterfaceId Int?
+  recommendedInterface   Interface? @relation("RecommendedInterface", fields: [recommendedInterfaceId], references: [id], onDelete: SetNull)
+  effectivenessScore Float
+  efficiencyScore    Float
+  satisfactionScore  Float
+  overallScore       Float
+  conclusions        String
+  recommendations    String
+  generatedAt        DateTime @default(now())
+  userStories        UserStory[]
+}
+
+model InterfaceSelection {
+  id           Int      @id @default(autoincrement())
+  evaluationId Int
+  evaluatorId  Int
+  interfaceId  Int
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  evaluator    User     @relation(fields: [evaluatorId], references: [id], onDelete: Cascade)
+  interface    Interface @relation(fields: [interfaceId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([evaluationId, evaluatorId])
+  @@index([evaluationId])
+  @@index([interfaceId])
+  @@index([evaluatorId])
+}
+
+model UserStory {
+  id                Int      @id @default(autoincrement())
+  resultId          Int
+  result            Result   @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  recommendedInterfaceId Int?
+  recommendedInterface   Interface? @relation("RecommendedInterfaceForUserStory", fields: [recommendedInterfaceId], references: [id], onDelete: SetNull)
+  title             String
+  narrative         String
+  acceptanceCriteria String
+  priority          Int      @default(3)
+  createdAt         DateTime @default(now())
+
+  @@index([recommendedInterfaceId])
+}
+
+model ManualUserStory {
+  id                Int      @id @default(autoincrement())
+  evaluationId      Int
+  interfaceId       Int?
+  recommendedInterfaceId Int?
+  createdById       Int
+  evaluation        Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  interface         Interface? @relation(fields: [interfaceId], references: [id], onDelete: SetNull)
+  recommendedInterface Interface? @relation("RecommendedInterfaceForManualUserStory", fields: [recommendedInterfaceId], references: [id], onDelete: SetNull)
+  createdBy         User     @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  title             String
+  narrative         String
+  acceptanceCriteria String
+  status            StoryStatus @default(DRAFT)
+  mosCow            MoSCoWPriority @default(SHOULD)
+  priority          Int      @default(3)
+  riceReach         Float?
+  riceImpact        Float?
+  riceConfidence    Float?
+  riceEffort        Float?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([evaluationId])
+  @@index([interfaceId])
+  @@index([recommendedInterfaceId])
+  @@index([createdById])
+}
+
+model EvaluationEvaluator {
+  id           Int      @id @default(autoincrement())
+  evaluationId Int
+  evaluatorId  Int
+  assignedById Int
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  evaluator    User     @relation("EvaluatorAssignments", fields: [evaluatorId], references: [id], onDelete: Cascade)
+  assignedBy   User     @relation("AssignedBy", fields: [assignedById], references: [id], onDelete: Restrict)
+  createdAt    DateTime @default(now())
+
+  @@unique([evaluationId, evaluatorId])
+  @@index([evaluationId])
+}
+
+model EvaluationSession {
+  id           Int      @id @default(autoincrement())
+  evaluationId Int
+  evaluatorId  Int
+  status       SessionStatus @default(IN_PROGRESS)
+  startedAt    DateTime @default(now())
+  endedAt      DateTime?
+  notes        String?
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  evaluator    User     @relation(fields: [evaluatorId], references: [id], onDelete: Cascade)
+
+  @@index([evaluationId])
+  @@index([evaluatorId])
+}
+
+model AuditLog {
+  id           Int      @id @default(autoincrement())
+  evaluationId Int?
+  actorId      Int
+  action       String
+  entityType   String
+  entityId     Int?
+  data         Json?
+  createdAt    DateTime @default(now())
+  evaluation   Evaluation? @relation(fields: [evaluationId], references: [id], onDelete: SetNull)
+  actor        User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([evaluationId])
+  @@index([actorId])
+}
