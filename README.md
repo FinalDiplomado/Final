@@ -57,3 +57,8 @@ Asegúrate de tener en ejecución ambos entornos (backend y frontend). Luego, de
 <br>
 npm run dev:desktop
 
+el sistema cuenta con un usuario administrador el cual tiene las siguientes credenciales <br>
+user: admin@demo.com <br>
+pass: 12345678 <br>
+
+al crear un usuario se asigna de forma automatica el rol de evaluadro el cual puede ser modificado por el administrador 
