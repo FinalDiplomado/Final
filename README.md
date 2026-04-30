@@ -46,8 +46,14 @@ npm install <br>
 npm install react react-dom react-router-dom <br>
 npm run dev <br>
 
-abre tu navegador y entrar a localhost con la url que aparece en el frontend <br>
+Existen dos formas de acceder al sistema:
+
+Desde el navegador: <br>
+Abre tu navegador e ingresa a localhost utilizando la URL que aparece en el frontend. <br>
 <img width="432" height="164" alt="image" src="https://github.com/user-attachments/assets/70783678-8ca7-4c03-8a7e-254750ac08c3" /> <br>
 
-Tener abiertos ambos entornos, backend y frontend, y ejecutar en la carpeta raíz el comando npm run dev:desktop.
+Modo escritorio:
+Asegúrate de tener en ejecución ambos entornos (backend y frontend). Luego, desde la carpeta raíz del proyecto, ejecuta el siguiente comando:
+<br>
+npm run dev:desktop
 
