@@ -1,46 +1,53 @@
 # Final
 ## Configuración inicial
 
-Para que el programa funcione correctamente después de clonar el repositorio, es necesario configurar las variables de entorno.
+Para que el programa funcione correctamente después de clonar el repositorio, es necesario configurar las variables de entorno. <br>
 
-El repositorio incluye un archivo llamado .env.example, que contiene la estructura y los nombres de todas las variables requeridas por la aplicación.
+El repositorio incluye un archivo llamado .env.example, que contiene la estructura y los nombres de todas las variables requeridas por la aplicación. <br>
 
-Pasos:
-Crea una copia del archivo .env.example
-Renómbrala como .env
-Guarda los cambios antes de ejecutar la aplicación.
-Este paso es obligatorio para el correcto funcionamiento del sistema.
 
-## Instalación de dependencias
+Pasos: <br>
+Crea una copia del archivo .env.example <br>
 
-Asegúrate de tener instalado Node.js. Luego, ejecuta el siguiente comando en la raíz del proyecto:
+Renómbrala como .env <br>
 
-npm install
+Guarda los cambios antes de ejecutar la aplicación. <br>
 
-## Ejecución de la aplicación
+Este paso es obligatorio para el correcto funcionamiento del sistema. <br>
 
-Después de clonar el repositorio, encontrarás dos carpetas:
 
-/frontend
+## Instalación de dependencias <br>
+
+Asegúrate de tener instalado Node.js. Luego, ejecuta el siguiente comando en la raíz del proyecto: <br>
+
+npm install <br>
+
+## Ejecución de la aplicación <br>
+
+Después de clonar el repositorio, encontrarás dos carpetas: <br>
+
+/frontend <br>
 /backend
 
-Debes iniciar una terminal (CMD) en cada una de ellas.
+Debes iniciar una terminal (CMD) en cada una de ellas. <br>
 
-Backend.
-Abre una terminal en la carpeta backend.
-Ejecuta los siguientes comandos:
-npm install
-npm install dotenv
-npx prisma generate
-npm run start:dev
+Backend. <br>
+Abre una terminal en la carpeta backend. <br>
+Ejecuta los siguientes comandos: <br>
+npm install <br>
+npm install dotenv <br>
+npx prisma generate <br>
+npm run start:dev <br>
 
-Frontend.
-Abre una terminal en la carpeta frontend.
-Ejecuta los siguientes comandos:
-npm install
-npm install react react-dom react-router-dom
-npm run dev
+Frontend. <br>
+Abre una terminal en la carpeta frontend. <br>
+Ejecuta los siguientes comandos: <br>
+npm install <br>
+npm install react react-dom react-router-dom <br>
+npm run dev <br>
 
-abre tu navegador y entrar a localhost generalnmente:
- 
-http://localhost:5173/
+abre tu navegador y entrar a localhost con la url que aparece en el frontend <br>
+<img width="432" height="164" alt="image" src="https://github.com/user-attachments/assets/70783678-8ca7-4c03-8a7e-254750ac08c3" /> <br>
+
+Tener abiertos ambos entornos, backend y frontend, y ejecutar en la carpeta raíz el comando npm run dev:desktop.
+
